@@ -19,9 +19,9 @@ import plotly.io as pio
 
 dash.register_page(
     __name__,
-    order=2,
-    title='Market Data',
-    name='Market Data'
+    order=6,
+    title='Portfolio Analytics',
+    name='Portfolio Analytics'
 )
 
-layout = html.Div('This is the Market Data Page')
+layout = html.Div('This is the Portfolio Analytics Page')

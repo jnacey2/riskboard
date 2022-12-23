@@ -75,19 +75,23 @@ def serve_layout():
     sidebar = html.Div([
             html.H2("riskboard", className="display-4"),
             html.Hr(),
-            dbc.Nav([
-                    dbc.NavLink("Home", href="/", active="exact"),
-                    dbc.NavLink("Market Data", href="/market-data", active="exact"),
-                    dbc.NavLink("Index Analytics", href="/indices", active="exact"),
-                    dbc.NavLink("Equity Analytics", href="/credit-main", active="exact"),
-                    dbc.NavLink("Statistical Arbitrage", href="/stat-arb", active="exact"),
-                    dbc.NavLink("Crypto Analytics", href="/crypto-main", active="exact"),
-                    dbc.NavLink("Economic Data", href="/econ-main", active="exact")],
+            dbc.Nav([dbc.NavLink(
+                f"{page['name']}", href=page["relative_path"]
+            )
+            for page in dash.page_registry.values()
+                    # dbc.NavLink("Home", href="/", active="exact"),
+                    # dbc.NavLink("Market Data", href="/market-data", active="exact"),
+                    # dbc.NavLink("Index Analytics", href="/indices", active="exact"),
+                    # dbc.NavLink("Equity Analytics", href="/credit-main", active="exact"),
+                    # dbc.NavLink("Statistical Arbitrage", href="/stat-arb", active="exact"),
+                    # dbc.NavLink("Crypto Analytics", href="/crypto-main", active="exact"),
+                    # dbc.NavLink("Economic Data", href="/econ-main", active="exact")
+                    ],
                 vertical=True,
                 pills=True)],
         style=SIDEBAR_STYLE,)
 
-    content = html.Div(id="page-content", style=CONTENT_STYLE)
+    content = html.Div(dash.page_container, style=CONTENT_STYLE)
 
     layout = html.Div([dcc.Location(id="url"), sidebar, content])
 
