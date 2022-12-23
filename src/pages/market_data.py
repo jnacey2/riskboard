@@ -46,7 +46,7 @@ def serve_layout():
     layout = html.Div(children=[
         html.Br(),
         html.Div(children=[
-            html.Center(html.H2('Market Data')),
+            html.Center(html.H3('Market Data')),
             html.Hr(),
             html.Div(children=[
                 dcc.Tabs(children=[

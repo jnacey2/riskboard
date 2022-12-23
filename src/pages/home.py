@@ -103,8 +103,9 @@ def serve_layout():
         children=[
             html.P(),
             dbc.Row(
-                html.Center(html.H5("Volatility-Adjusted Macro Dashboard")),
+                html.Center(html.H3("Volatility-Adjusted Macro Dashboard")),
             ),
+            html.Hr(),
             html.Center(
                 html.Div(
                     """The Volatility-Adjusted Macro Dasboard displays macroeconomic variables relevant to market 
