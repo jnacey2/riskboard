@@ -1,8 +1,6 @@
 # Data manipulation libraries
 import numpy as np
 import pandas as pd
-import boto3
-import s3fs
 
 # Dashboard-related libraries
 import dash
@@ -59,38 +57,43 @@ TAB_SELECTED_STYLE = {
 }
 
 
-
-
-
-
 ######################
 ### BEGIN APP LAYOUT #
 ######################
 
-app = dash.Dash(external_stylesheets=[dbc.themes.SUPERHERO], suppress_callback_exceptions=True)
-app.title = "Lemon Hill RiskBoard"
+app = dash.Dash(external_stylesheets=[dbc.themes.SUPERHERO],
+                use_pages=True,
+                suppress_callback_exceptions=True)
+app.title = "riskboard"
 auth = dash_auth.BasicAuth(app, USERNAME_PASSWORD_PAIRS)
 server = app.server
 
 # Sidebar implemention
-sidebar = html.Div([
-        html.H2("riskboard", className="display-4"),
-        html.Hr(),
-        dbc.Nav([
-                dbc.NavLink("Home", href="/", active="exact"),
-                dbc.NavLink("S&P 500 Analytics", href="/spx-main", active="exact"),
-                dbc.NavLink("NASDAQ 100 Analytics", href="/qqq-main", active="exact"),
-                dbc.NavLink("Russell 2000 Analytics", href="/r2k-main", active="exact"),
-                dbc.NavLink("Crypto Market Analytics", href="/crypto-main", active="exact"),
-                dbc.NavLink("Credit Market Analytics", href="/credit-main", active="exact"),
-                dbc.NavLink("Economic Data", href="/econ-main", active="exact")],
-            vertical=True,
-            pills=True)],
-    style=SIDEBAR_STYLE,)
 
-content = html.Div(id="page-content", style=CONTENT_STYLE)
+def serve_layout():
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
+    sidebar = html.Div([
+            html.H2("riskboard", className="display-4"),
+            html.Hr(),
+            dbc.Nav([
+                    dbc.NavLink("Home", href="/", active="exact"),
+                    dbc.NavLink("Market Data", href="/market-data", active="exact"),
+                    dbc.NavLink("Index Analytics", href="/indices", active="exact"),
+                    dbc.NavLink("Equity Analytics", href="/credit-main", active="exact"),
+                    dbc.NavLink("Statistical Arbitrage", href="/stat-arb", active="exact"),
+                    dbc.NavLink("Crypto Analytics", href="/crypto-main", active="exact"),
+                    dbc.NavLink("Economic Data", href="/econ-main", active="exact")],
+                vertical=True,
+                pills=True)],
+        style=SIDEBAR_STYLE,)
+
+    content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+    layout = html.Div([dcc.Location(id="url"), sidebar, content])
+
+    return layout
+
+app.layout = serve_layout    
 
 if __name__ == "__main__":
     app.run_server(debug=True)
