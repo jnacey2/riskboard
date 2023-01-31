@@ -99,6 +99,16 @@ commodities_table = dashboard_tables(macro_df, ["Copper", "Gold"])
 
 
 def serve_layout():
+    macro_df = pd.read_csv("https://nacey-capstone.s3.amazonaws.com/macro_dash.csv")
+    macro_df["BBB OAS"] = macro_df["BBB OAS"] * 100
+    macro_df["CCC OAS"] = macro_df["CCC OAS"] * 100
+    macro_df["BB OAS"] = macro_df["BB OAS"] * 100
+    macro_df["B OAS"] = macro_df["B OAS"] * 100
+    macro_df["BAML IG OAS"] = macro_df["BAML IG OAS"] * 100
+    macro_df["BAML HY OAS"] = macro_df["BAML HY OAS"] * 100
+
+    std_df = macro_df.drop(["Unnamed: 0"], axis=1).diff(5).describe().T["std"]
+
     layout = html.Div(
         children=[
             html.P(),
@@ -114,6 +124,30 @@ def serve_layout():
                 )
             ),
             html.P(" "),
+            html.P(" "),
+            html.Center(html.Div([
+                dbc.RadioItems(
+                        id="radios",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "1D", "value": 1},
+                            {"label": "2D", "value": 2},
+                            {"label": "3D", "value": 3},
+                            {"label": "5D", "value": 4},
+                            {"label": "10D", "value": 5},
+                            {"label": "1M", "value": 6},
+                            {"label": "2M", "value": 7},
+                            {"label": "3M", "value": 8},
+                            {"label": "6M", "value": 9},
+                            {"label": "1Y", "value": 10},
+                        ],
+                    value=1,),
+                html.Div(id="output"),
+            ],
+            className="radio-group")),
             html.P(" "),
             dbc.Row(
                 children=[
