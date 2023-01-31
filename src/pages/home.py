@@ -20,82 +20,7 @@ import plotly.io as pio
 
 dash.register_page(__name__, path="/", order=1)
 
-macro_df = pd.read_csv("https://nacey-capstone.s3.amazonaws.com/macro_dash.csv")
-macro_df["BBB OAS"] = macro_df["BBB OAS"] * 100
-macro_df["CCC OAS"] = macro_df["CCC OAS"] * 100
-macro_df["BB OAS"] = macro_df["BB OAS"] * 100
-macro_df["B OAS"] = macro_df["B OAS"] * 100
-macro_df["BAML IG OAS"] = macro_df["BAML IG OAS"] * 100
-macro_df["BAML HY OAS"] = macro_df["BAML HY OAS"] * 100
 
-std_df = macro_df.drop(["Unnamed: 0"], axis=1).diff(5).describe().T["std"]
-
-
-def dashboard_tables(main_df, names, std_df=std_df):
-    df = pd.DataFrame(index=names, columns=["Level", "1Wk Δ", "1Wk Std"])
-
-    for name in names:
-        df.loc[name]["Level"] = main_df[name].tail(1).item()
-
-    for name in names:
-        df.loc[name]["1Wk Δ"] = (
-            df.loc[name]["Level"] - main_df[name][:-5].tail(1).item()
-        )
-
-    for name in names:
-        df.loc[name]["1Wk Std"] = std_df.loc[name]
-
-    df["Δ Z-Score"] = df["1Wk Δ"] / df["1Wk Std"]
-
-    df.reset_index(inplace=True)
-    df["Level"] = df["Level"].astype(float).round(decimals=3)
-    df["1Wk Δ"] = df["1Wk Δ"].astype(float).round(decimals=3)
-    df["1Wk Std"] = df["1Wk Std"].astype(float).round(decimals=3)
-    df["Δ Z-Score"] = df["Δ Z-Score"].astype(float).round(decimals=3)
-
-    df = df.drop("1Wk Std", axis=1)
-
-    df = df.rename(columns={"index": ""})
-
-    return df
-
-
-# Rates Tables
-treas_rates_table = dashboard_tables(
-    macro_df, ["2yTreas", "5yTreas", "10yTreas", "30yTreas", "30yr Mortgage"]
-)
-curve_rates_table = dashboard_tables(macro_df, ["2s10s", "2s30s", "5s30s"])
-ilbe_rates_table = dashboard_tables(macro_df, ["5y5yILBE", "5yrReal"])
-
-# Equity Tables
-equity_indices_table = dashboard_tables(
-    macro_df,
-    [
-        "SPX",
-        "NASDAQ",
-        "Russell",
-        "FTSE",
-        "DAX",
-        "CAC40",
-        "Nikkei",
-        "Shenzen",
-        "Hang Seng",
-    ],
-)
-
-vol_table = dashboard_tables(macro_df, ["VIX", "VVIX", "VXN"])
-
-# US Credit Tables
-baml_rates_table = dashboard_tables(macro_df, ["BAML IG OAS", "BAML HY OAS"])
-corp_rates_table = dashboard_tables(macro_df, ["BBB OAS", "BB OAS", "B OAS", "CCC OAS"])
-
-# FX Table
-currency_table = dashboard_tables(
-    macro_df, ["EURUSD", "USDGBP", "CHFUSD", "USDJPY", "CADUSD", "MXNUSD", "USDYUAN"]
-)
-
-# Commodity Table
-commodities_table = dashboard_tables(macro_df, ["Copper", "Gold"])
 
 
 def serve_layout():
@@ -108,6 +33,73 @@ def serve_layout():
     macro_df["BAML HY OAS"] = macro_df["BAML HY OAS"] * 100
 
     std_df = macro_df.drop(["Unnamed: 0"], axis=1).diff(5).describe().T["std"]
+
+
+    def dashboard_tables(main_df, names, std_df=std_df):
+        df = pd.DataFrame(index=names, columns=["Level", "1Wk Δ", "1Wk Std"])
+
+        for name in names:
+            df.loc[name]["Level"] = main_df[name].tail(1).item()
+
+        for name in names:
+            df.loc[name]["1Wk Δ"] = (
+                df.loc[name]["Level"] - main_df[name][:-5].tail(1).item()
+            )
+
+        for name in names:
+            df.loc[name]["1Wk Std"] = std_df.loc[name]
+
+        df["Δ Z-Score"] = df["1Wk Δ"] / df["1Wk Std"]
+
+        df.reset_index(inplace=True)
+        df["Level"] = df["Level"].astype(float).round(decimals=3)
+        df["1Wk Δ"] = df["1Wk Δ"].astype(float).round(decimals=3)
+        df["1Wk Std"] = df["1Wk Std"].astype(float).round(decimals=3)
+        df["Δ Z-Score"] = df["Δ Z-Score"].astype(float).round(decimals=3)
+
+        df = df.drop("1Wk Std", axis=1)
+
+        df = df.rename(columns={"index": ""})
+
+        return df
+
+
+    # Rates Tables
+    treas_rates_table = dashboard_tables(
+        macro_df, ["2yTreas", "5yTreas", "10yTreas", "30yTreas", "30yr Mortgage"]
+    )
+    curve_rates_table = dashboard_tables(macro_df, ["2s10s", "2s30s", "5s30s"])
+    ilbe_rates_table = dashboard_tables(macro_df, ["5y5yILBE", "5yrReal"])
+
+    # Equity Tables
+    equity_indices_table = dashboard_tables(
+        macro_df,
+        [
+            "SPX",
+            "NASDAQ",
+            "Russell",
+            "FTSE",
+            "DAX",
+            "CAC40",
+            "Nikkei",
+            "Shenzen",
+            "Hang Seng",
+        ],
+    )
+
+    vol_table = dashboard_tables(macro_df, ["VIX", "VVIX", "VXN"])
+
+    # US Credit Tables
+    baml_rates_table = dashboard_tables(macro_df, ["BAML IG OAS", "BAML HY OAS"])
+    corp_rates_table = dashboard_tables(macro_df, ["BBB OAS", "BB OAS", "B OAS", "CCC OAS"])
+
+    # FX Table
+    currency_table = dashboard_tables(
+        macro_df, ["EURUSD", "USDGBP", "CHFUSD", "USDJPY", "CADUSD", "MXNUSD", "USDYUAN"]
+    )
+
+    # Commodity Table
+    commodities_table = dashboard_tables(macro_df, ["Copper", "Gold"])
 
     layout = html.Div(
         children=[
